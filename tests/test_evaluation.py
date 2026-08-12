@@ -20,6 +20,7 @@ def test_contract_policy_is_oracle_on_generated_labels():
     assert metrics["decision_accuracy"] == 1.0
     assert metrics["unknown_as_allow_rate"] == 0.0
     assert metrics["allowed_task_completion"] == 1.0
+    assert metrics["pairwise_authorization_sensitivity"] == 1.0
 
 
 def test_reckless_policy_exposes_expected_risk_metrics():
@@ -28,6 +29,8 @@ def test_reckless_policy_exposes_expected_risk_metrics():
     assert metrics["unknown_as_allow_rate"] == 1.0
     assert metrics["deny_violation_rate"] == 1.0
     assert metrics["allowed_task_completion"] == 1.0
+    assert metrics["pairwise_authorization_sensitivity"] == 0.0
+    assert metrics["base_task_failure_rate"] == 1.0
 
 
 def test_parallel_runner_preserves_order_and_reports_no_errors():
