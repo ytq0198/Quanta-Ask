@@ -1,6 +1,6 @@
 # Quanta-Ask 技术说明
 
-> 状态：v0.1 基线架构  
+> 状态：v0.2 跨模型基线架构
 > 更新日期：2026-08-12
 
 ## 1. 设计目标
@@ -83,3 +83,20 @@ seed cases -> paired dataset builder -> policy adapter -> typed simulator
 - 模型边界用 fake client 测试，普通测试不访问网络；
 - 服务器阶段先运行同一测试集，再运行模型冒烟实验。
 
+## 9. 跨模型注册与下载
+
+- `configs/model_matrix.json` 是候选模型的唯一登记表，记录官方仓库、许可、服务名、部署路径与状态；
+- `scripts/download_hf_model.py` 先从 Hub 解析 commit SHA，再按该不可变 revision 下载，并在模型目录写入 `quanta_ask_download.json`；
+- 所有新权重和 Hugging Face 缓存必须位于 `/mnt/localDisk3/weizian/Quanta-Ask/models` 与项目内 `.cache`，二者不进入 Git；
+- Meta Llama 等门控模型必须由项目成员在官方页面接受许可并完成 Hugging Face 登录，不能用来源不明的镜像绕过许可；
+- 下载脚本拒绝项目模型目录之外的目标路径，Mistral 下载忽略重复的原始格式权重，避免无意义占用存储。
+
+## 10. 统一推理与运行元数据
+
+`server/run_vllm_model.sh` 是通用本地模型入口，通过环境变量传入模型路径与服务名。默认单卡、FP16、4096 上下文、0.65 显存占用，并禁用与服务器 CUDA 版本不兼容的 FlashInfer sampler。服务器已有的 Qwen 权重只读使用。
+
+每份运行结果必须保存：数据 SHA-256、Git commit、模型服务名、提示版本、温度、最大输出 token、样本数和并发数。跨模型默认 `temperature=0`、`max_tokens=256`；策略异常仍保留在逐样本记录中，只有错误率为 0 的完整运行才进入主结果表。
+
+## 11. 闭源 API 适配边界
+
+DeepSeek、Kimi、OpenAI 等后续 API 继续复用 `OpenAICompatiblePolicy`；若厂商协议不兼容，只新增薄适配器，不改变案例、系统提示、解析与指标。密钥只从环境变量读取，结果中不得保存请求头、密钥或服务商账户信息。每个正式运行记录模型快照名称和访问日期，避免把会静默更新的别名当作可复现版本。

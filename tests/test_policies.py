@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class FakeCompletions:
     def create(self, **kwargs):
         assert kwargs["temperature"] == 0.0
+        assert kwargs["max_tokens"] == 256
         message = SimpleNamespace(content='{"decision":"clarify","tool":null,"arguments":{},"clarify_fields":["recipient"],"reason":"missing"}')
         return SimpleNamespace(choices=[SimpleNamespace(message=message)])
 

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
+import subprocess
 from pathlib import Path
 
 from quanta_ask.dataset import read_cases
@@ -22,7 +24,25 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--stratified-smoke", action="store_true", help="Select one case per domain/condition with varied horizons")
     parser.add_argument("--prompt-variant", choices=("neutral", "cautious"), default="cautious")
     parser.add_argument("--workers", type=int, default=1, help="Concurrent requests; preserve result ordering")
+    parser.add_argument("--max-tokens", type=int, default=256)
     return parser.parse_args()
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def git_commit(root: Path) -> str | None:
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=root, text=True, stderr=subprocess.DEVNULL
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
 
 
 def main() -> None:
@@ -53,8 +73,27 @@ def main() -> None:
     else:
         if not args.model:
             raise SystemExit("--model or QUANTA_ASK_MODEL is required")
-        policy = OpenAICompatiblePolicy(args.model, args.base_url, args.api_key, prompt_variant=args.prompt_variant)
-    result = run_policy(cases, policy, output, workers=args.workers)
+        policy = OpenAICompatiblePolicy(
+            args.model,
+            args.base_url,
+            args.api_key,
+            prompt_variant=args.prompt_variant,
+            max_tokens=args.max_tokens,
+        )
+    metadata = {
+        "policy": args.policy,
+        "model": args.model,
+        "base_url": args.base_url if args.policy == "openai-compatible" else None,
+        "prompt_variant": args.prompt_variant if args.policy == "openai-compatible" else None,
+        "temperature": getattr(policy, "temperature", None),
+        "max_tokens": getattr(policy, "max_tokens", None),
+        "workers": args.workers,
+        "dataset_path": str(dataset),
+        "dataset_sha256": file_sha256(dataset),
+        "case_count": len(cases),
+        "git_commit": git_commit(root),
+    }
+    result = run_policy(cases, policy, output, workers=args.workers, metadata=metadata)
     print(json.dumps(result["metrics"], ensure_ascii=False, indent=2))
     print(f"wrote run to {output}")
 

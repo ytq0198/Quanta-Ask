@@ -17,7 +17,13 @@ def _run_one(case: Case, policy) -> tuple[Decision, str | None]:
         return decision, f"{type(exc).__name__}: {exc}"
 
 
-def run_policy(cases: list[Case], policy, output_path: Path | None = None, workers: int = 1) -> dict:
+def run_policy(
+    cases: list[Case],
+    policy,
+    output_path: Path | None = None,
+    workers: int = 1,
+    metadata: dict | None = None,
+) -> dict:
     if workers <= 0:
         raise ValueError("workers must be positive")
     if workers == 1:
@@ -35,6 +41,7 @@ def run_policy(cases: list[Case], policy, output_path: Path | None = None, worke
     metrics["policy_error_rate"] = sum(error is not None for _, error in outputs) / len(outputs) if outputs else 0.0
     result = {
         "created_at": datetime.now(timezone.utc).isoformat(),
+        "metadata": metadata or {},
         "metrics": metrics,
         "records": records,
     }

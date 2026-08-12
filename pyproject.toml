@@ -12,6 +12,7 @@ dependencies = []
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
 model = ["openai>=1.40"]
+download = ["huggingface_hub>=1.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -19,4 +20,3 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
-

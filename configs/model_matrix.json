@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "models": [
+    {
+      "key": "qwen25_7b",
+      "repo_id": "Qwen/Qwen2.5-7B-Instruct",
+      "served_name": "qwen2.5-7b-instruct",
+      "license": "apache-2.0",
+      "status": "baseline_complete",
+      "local_path": "/mnt/localDisk3/weizian/models/Qwen2.5-7B-Instruct",
+      "notes": "Pre-existing read-only weights; do not modify this directory."
+    },
+    {
+      "key": "deepseek_r1_distill_qwen_7b",
+      "repo_id": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "served_name": "deepseek-r1-distill-qwen-7b",
+      "license": "mit",
+      "status": "planned_public_download",
+      "local_path": "/mnt/localDisk3/weizian/Quanta-Ask/models/DeepSeek-R1-Distill-Qwen-7B"
+    },
+    {
+      "key": "mistral_7b_v03",
+      "repo_id": "mistralai/Mistral-7B-Instruct-v0.3",
+      "served_name": "mistral-7b-instruct-v0.3",
+      "license": "apache-2.0",
+      "status": "planned_public_download",
+      "local_path": "/mnt/localDisk3/weizian/Quanta-Ask/models/Mistral-7B-Instruct-v0.3",
+      "ignore_patterns": ["consolidated.safetensors", "params.json", "tokenizer.model.v3"]
+    },
+    {
+      "key": "phi35_mini",
+      "repo_id": "microsoft/Phi-3.5-mini-instruct",
+      "served_name": "phi-3.5-mini-instruct",
+      "license": "mit",
+      "status": "planned_public_download",
+      "local_path": "/mnt/localDisk3/weizian/Quanta-Ask/models/Phi-3.5-mini-instruct"
+    },
+    {
+      "key": "llama32_3b",
+      "repo_id": "meta-llama/Llama-3.2-3B-Instruct",
+      "served_name": "llama-3.2-3b-instruct",
+      "license": "llama-3.2-community",
+      "status": "blocked_pending_license_and_hf_login",
+      "local_path": "/mnt/localDisk3/weizian/Quanta-Ask/models/Llama-3.2-3B-Instruct"
+    }
+  ]
+}
