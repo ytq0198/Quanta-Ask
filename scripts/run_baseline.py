@@ -21,6 +21,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--limit", type=int, help="Run only the first N cases for a smoke test")
     parser.add_argument("--stratified-smoke", action="store_true", help="Select one case per domain/condition with varied horizons")
     parser.add_argument("--prompt-variant", choices=("neutral", "cautious"), default="cautious")
+    parser.add_argument("--workers", type=int, default=1, help="Concurrent requests; preserve result ordering")
     return parser.parse_args()
 
 
@@ -53,7 +54,7 @@ def main() -> None:
         if not args.model:
             raise SystemExit("--model or QUANTA_ASK_MODEL is required")
         policy = OpenAICompatiblePolicy(args.model, args.base_url, args.api_key, prompt_variant=args.prompt_variant)
-    result = run_policy(cases, policy, output)
+    result = run_policy(cases, policy, output, workers=args.workers)
     print(json.dumps(result["metrics"], ensure_ascii=False, indent=2))
     print(f"wrote run to {output}")
 
