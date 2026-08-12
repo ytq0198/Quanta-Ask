@@ -19,6 +19,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", default=os.environ.get("QUANTA_ASK_MODEL"))
     parser.add_argument("--api-key", default=os.environ.get("QUANTA_ASK_API_KEY", "local-not-secret"))
     parser.add_argument("--limit", type=int, help="Run only the first N cases for a smoke test")
+    parser.add_argument("--stratified-smoke", action="store_true", help="Select one case per domain/condition with varied horizons")
+    parser.add_argument("--prompt-variant", choices=("neutral", "cautious"), default="cautious")
     return parser.parse_args()
 
 
@@ -28,6 +30,17 @@ def main() -> None:
     dataset = args.dataset or root / "data" / "generated" / "phase1_cases.jsonl"
     output = args.output or root / "runs" / f"phase1-{args.policy}.json"
     cases = read_cases(dataset)
+    if args.stratified_smoke:
+        selected = []
+        seen = set()
+        horizons = (0, 4, 8, 16)
+        for case in cases:
+            key = (case.domain, case.condition)
+            target_horizon = horizons[(len(seen) + len(case.domain)) % len(horizons)]
+            if key not in seen and case.horizon == target_horizon:
+                selected.append(case)
+                seen.add(key)
+        cases = selected
     if args.limit is not None:
         if args.limit <= 0:
             raise SystemExit("--limit must be positive")
@@ -39,7 +52,7 @@ def main() -> None:
     else:
         if not args.model:
             raise SystemExit("--model or QUANTA_ASK_MODEL is required")
-        policy = OpenAICompatiblePolicy(args.model, args.base_url, args.api_key)
+        policy = OpenAICompatiblePolicy(args.model, args.base_url, args.api_key, prompt_variant=args.prompt_variant)
     result = run_policy(cases, policy, output)
     print(json.dumps(result["metrics"], ensure_ascii=False, indent=2))
     print(f"wrote run to {output}")

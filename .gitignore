@@ -8,3 +8,5 @@ data/generated/
 runs/
 reports/generated/
 *.log
+*.tar.gz
+phase1-*.json
