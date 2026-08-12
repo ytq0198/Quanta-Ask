@@ -22,3 +22,19 @@ def test_openai_compatible_policy_parses_structured_response():
     assert decision.decision.value == "clarify"
     assert decision.clarify_fields == ("recipient",)
 
+
+def test_openai_compatible_policy_rejects_missing_json():
+    class InvalidCompletions:
+        def create(self, **kwargs):
+            message = SimpleNamespace(content="I would ask the user.")
+            return SimpleNamespace(choices=[SimpleNamespace(message=message)])
+
+    client = SimpleNamespace(chat=SimpleNamespace(completions=InvalidCompletions()))
+    case = build_cases(load_seed_cases(ROOT / "data" / "seeds" / "phase1_seed_cases.jsonl"), horizons=(0,))[2]
+    policy = OpenAICompatiblePolicy("fake", "http://localhost/v1", client=client)
+    try:
+        policy.decide(case)
+    except ValueError as exc:
+        assert "JSON object" in str(exc)
+    else:
+        raise AssertionError("invalid model output must not be silently accepted")

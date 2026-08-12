@@ -18,6 +18,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--base-url", default=os.environ.get("QUANTA_ASK_BASE_URL", "http://127.0.0.1:8000/v1"))
     parser.add_argument("--model", default=os.environ.get("QUANTA_ASK_MODEL"))
     parser.add_argument("--api-key", default=os.environ.get("QUANTA_ASK_API_KEY", "local-not-secret"))
+    parser.add_argument("--limit", type=int, help="Run only the first N cases for a smoke test")
     return parser.parse_args()
 
 
@@ -27,6 +28,10 @@ def main() -> None:
     dataset = args.dataset or root / "data" / "generated" / "phase1_cases.jsonl"
     output = args.output or root / "runs" / f"phase1-{args.policy}.json"
     cases = read_cases(dataset)
+    if args.limit is not None:
+        if args.limit <= 0:
+            raise SystemExit("--limit must be positive")
+        cases = cases[: args.limit]
     if args.policy == "heuristic":
         policy = ContractPolicy()
     elif args.policy == "reckless":
@@ -42,4 +47,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
