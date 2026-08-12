@@ -2,7 +2,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from quanta_ask.dataset import build_cases, load_seed_cases
-from quanta_ask.policies import OpenAICompatiblePolicy
+from quanta_ask.policies import ModelOutputError, OpenAICompatiblePolicy
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,7 +35,8 @@ def test_openai_compatible_policy_rejects_missing_json():
     policy = OpenAICompatiblePolicy("fake", "http://localhost/v1", client=client)
     try:
         policy.decide(case)
-    except ValueError as exc:
+    except ModelOutputError as exc:
         assert "JSON object" in str(exc)
+        assert exc.raw_output == "I would ask the user."
     else:
         raise AssertionError("invalid model output must not be silently accepted")

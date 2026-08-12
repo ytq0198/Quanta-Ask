@@ -95,16 +95,26 @@
 | 模型 | 规模/家族角色 | 许可 | 本阶段用途 | 当前状态 |
 |---|---|---|---|---|
 | Qwen2.5-7B-Instruct | Qwen 指令基线 | Apache-2.0 | 已完成的参照模型 | 完整 192×2 已运行 |
-| DeepSeek-R1-Distill-Qwen-7B | 推理蒸馏对齐 | MIT | 检验推理型对齐是否改善授权辨别 | 待下载与测试 |
-| Mistral-7B-Instruct-v0.3 | 不同 7B 架构 | Apache-2.0 | 检验跨基础家族泛化 | 待下载与测试 |
-| Phi-3.5-mini-instruct | 小型高效模型 | MIT | 检验规模敏感性 | 待下载与测试 |
+| DeepSeek-R1-Distill-Qwen-7B | 推理蒸馏对齐 | MIT | 检验推理型对齐是否改善授权辨别 | 已下载；256-token 格式门槛失败，暂不入主表 |
+| Mistral-7B-Instruct-v0.3 | 不同 7B 架构 | Apache-2.0 | 检验跨基础家族泛化 | 完整 192×2 已运行 |
+| Phi-3.5-mini-instruct | 小型高效模型 | MIT | 检验规模敏感性 | 完整 192×2 已运行 |
 | Meta-Llama-3.2-3B-Instruct | Meta/Llama 小模型 | Llama 3.2 Community | 补充主流 Llama 家族 | 需接受许可并登录 Hugging Face 后下载 |
 
 官方模型卡：[Qwen2.5-7B](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct)、[DeepSeek-R1-Distill-Qwen-7B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B)、[Mistral-7B-v0.3](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3)、[Phi-3.5-mini](https://huggingface.co/microsoft/Phi-3.5-mini-instruct)、[Llama-3.2-3B](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct)。
 
 公平比较协议：使用同一 QAAP v0.1 数据、`neutral/cautious` 两种固定提示、`temperature=0`、最多 256 个输出 token、相同解析器和指标；每个模型先运行 16 条分层冒烟，解析错误率为 0 后再运行 192 条完整实验。聊天模板仅允许采用模型官方模板，不做针对某个模型的提示调参。
 
-### 4.5 后续付费 API 扩展
+### 4.5 Phase 1B 阶段判断（2026-08-13）
+
+主线通过预注册的跨模型 Go 条件：Qwen2.5-7B、Phi-3.5-mini 和 Mistral-7B 三个可复现模型的 UAR 都显著高于 10%，且失败覆盖邮件、文件、日历、支付四个领域。当前证据还不足以把 192 条当作独立样本，也没有支持长轨迹单调退化，因此下一阶段应：
+
+1. 冻结主线为“未知授权的参数级审计与风险敏感澄清”；
+2. 冻结优先副线为“授权来源追踪与伪造证据抵抗”；
+3. 把长轨迹遗忘保留为探索性分析，不作为当前论文第一贡献；
+4. 将 prompt-only 作为必须击败的强基线：既比较 UER/UAR，也比较 ATC/ORR，防止靠全面拒绝获得表面安全；
+5. 在方法开发前扩大基础任务并进行双人独立标注，因为当前独立实验单元只有 12 个基础任务。
+
+### 4.6 后续付费 API 扩展
 
 在开源模型矩阵确定失败模式后，再向导师申请 DeepSeek、Kimi 和 OpenAI API 经费。闭源模型不是用来替代开源基线，而是检验现象能否延伸到能力更强的生产模型。正式采购前记录模型精确版本、当日价格、数据保留政策和地区可用性；先用 16 条分层样本估算费用与解析稳定性，再运行完整矩阵。若服务允许非零随机性，则增加重复运行并报告均值与置信区间；不得把“ChatGPT 网页版”与可固定请求参数的 OpenAI API 混为同一实验条件。
 

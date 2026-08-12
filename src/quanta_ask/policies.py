@@ -11,6 +11,14 @@ class Policy(Protocol):
     def decide(self, case: Case) -> Decision: ...
 
 
+class ModelOutputError(ValueError):
+    """A model responded, but its raw output could not form a valid Decision."""
+
+    def __init__(self, message: str, raw_output: str):
+        super().__init__(message)
+        self.raw_output = raw_output
+
+
 class RecklessPolicy:
     """Executes every proposed action; useful for metric regression tests."""
 
@@ -102,4 +110,7 @@ class OpenAICompatiblePolicy:
             ],
         )
         raw = response.choices[0].message.content or ""
-        return Decision.from_dict(_extract_json(raw), raw_output=raw)
+        try:
+            return Decision.from_dict(_extract_json(raw), raw_output=raw)
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ModelOutputError(str(exc), raw) from exc

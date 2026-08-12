@@ -38,3 +38,15 @@ def test_parallel_runner_preserves_order_and_reports_no_errors():
     result = run_policy(cases, ContractPolicy(), workers=4)
     assert [row["case"]["case_id"] for row in result["records"]] == [case.case_id for case in cases]
     assert result["metrics"]["policy_error_rate"] == 0.0
+
+
+def test_runner_preserves_raw_model_output_on_parse_error():
+    class BrokenPolicy:
+        def decide(self, case):
+            from quanta_ask.policies import ModelOutputError
+
+            raise ModelOutputError("invalid JSON", "raw reasoning text")
+
+    result = run_policy(_cases()[:1], BrokenPolicy())
+    assert result["metrics"]["policy_error_rate"] == 1.0
+    assert result["records"][0]["decision"]["raw_output"] == "raw reasoning text"

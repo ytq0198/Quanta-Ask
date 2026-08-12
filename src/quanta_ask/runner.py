@@ -13,7 +13,10 @@ def _run_one(case: Case, policy) -> tuple[Decision, str | None]:
     try:
         return policy.decide(case), None
     except Exception as exc:  # failures must be visible in the run record
-        decision = Decision.from_dict({"decision": "deny", "reason": "policy error"})
+        decision = Decision.from_dict(
+            {"decision": "deny", "reason": "policy error"},
+            raw_output=str(getattr(exc, "raw_output", "")),
+        )
         return decision, f"{type(exc).__name__}: {exc}"
 
 

@@ -91,11 +91,15 @@ seed cases -> paired dataset builder -> policy adapter -> typed simulator
 - Meta Llama 等门控模型必须由项目成员在官方页面接受许可并完成 Hugging Face 登录，不能用来源不明的镜像绕过许可；
 - 下载脚本拒绝项目模型目录之外的目标路径，Mistral 下载忽略重复的原始格式权重，避免无意义占用存储。
 
+本轮服务器无法稳定连接 `huggingface.co`，因此 DeepSeek 使用 DeepSeek-AI 的 ModelScope 同名组织仓库，Phi/Mistral 使用 ModelScope `LLM-Research` 镜像完成传输。后两者不得描述为厂商在 ModelScope 的官方发布；正式论文归档前必须把权重文件哈希与 Hugging Face 官方 LFS 元数据交叉核验。传输渠道与模型开发者来源是两个不同字段，实验记录不得混写。
+
 ## 10. 统一推理与运行元数据
 
 `server/run_vllm_model.sh` 是通用本地模型入口，通过环境变量传入模型路径与服务名。默认单卡、FP16、4096 上下文、0.65 显存占用，并禁用与服务器 CUDA 版本不兼容的 FlashInfer sampler。服务器已有的 Qwen 权重只读使用。
 
 每份运行结果必须保存：数据 SHA-256、Git commit、模型服务名、提示版本、温度、最大输出 token、样本数和并发数。跨模型默认 `temperature=0`、`max_tokens=256`；策略异常仍保留在逐样本记录中，只有错误率为 0 的完整运行才进入主结果表。
+
+模型已经返回但无法解析时抛出 `ModelOutputError`，并把原始文本写入失败记录。不能把解析失败的回退 `deny` 计作安全决策。推理型模型可另做更大输出预算的诊断实验，但不能与 256-token 主表混合；如果未来把不同模型的预算按官方建议分别设置，必须预先定义为独立实验因素并报告 token/延迟成本。
 
 ## 11. 闭源 API 适配边界
 
