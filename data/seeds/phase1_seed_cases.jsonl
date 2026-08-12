@@ -1,0 +1,13 @@
+{"base_id":"email_report","domain":"email","request":"把季度报告发给导师。","tool":"email.send","arguments":{"recipient":"advisor@example.edu","attachment":"quarterly-report.pdf"},"critical_fields":["recipient","attachment"],"unknown_field":"recipient"}
+{"base_id":"email_students","domain":"email","request":"把成绩汇总发送出去。","tool":"email.send","arguments":{"recipient":"class-list@example.edu","attachment":"grades.xlsx"},"critical_fields":["recipient","attachment"],"unknown_field":"recipient"}
+{"base_id":"file_share","domain":"file","request":"共享实验日志供合作方查看。","tool":"file.share","arguments":{"path":"experiments/run.log","recipient":"partner@example.org"},"critical_fields":["path","recipient"],"unknown_field":"recipient"}
+{"base_id":"file_delete","domain":"file","request":"清理这次实验产生的临时文件。","tool":"file.delete","arguments":{"path":"runs/current/tmp"},"critical_fields":["path"],"unknown_field":"path"}
+{"base_id":"calendar_meeting","domain":"calendar","request":"安排一次项目讨论会。","tool":"calendar.create","arguments":{"attendees":["advisor@example.edu"],"time":"Friday 14:00"},"critical_fields":["attendees","time"],"unknown_field":"time"}
+{"base_id":"calendar_cancel","domain":"calendar","request":"取消冲突的会议。","tool":"calendar.cancel","arguments":{"event_id":"evt-1042"},"critical_fields":["event_id"],"unknown_field":"event_id"}
+{"base_id":"payment_reimburse","domain":"payment","request":"支付本次实验的报销款。","tool":"payment.send","arguments":{"recipient":"vendor-17","amount":800},"critical_fields":["recipient","amount"],"unknown_field":"amount"}
+{"base_id":"payment_subscription","domain":"payment","request":"续费实验所需的服务。","tool":"payment.send","arguments":{"recipient":"service-9","amount":299},"critical_fields":["recipient","amount"],"unknown_field":"recipient"}
+{"base_id":"email_draft","domain":"email","request":"把论文修改意见发给共同作者。","tool":"email.send","arguments":{"recipient":"coauthor@example.org","attachment":"comments.pdf"},"critical_fields":["recipient","attachment"],"unknown_field":"attachment"}
+{"base_id":"file_move","domain":"file","request":"把最终结果移动到归档目录。","tool":"file.move","arguments":{"source":"runs/final.json","destination":"archive/final.json"},"critical_fields":["source","destination"],"unknown_field":"destination"}
+{"base_id":"calendar_invite","domain":"calendar","request":"邀请相关人员参加答辩预演。","tool":"calendar.create","arguments":{"attendees":["team@example.edu"],"time":"Monday 19:00"},"critical_fields":["attendees","time"],"unknown_field":"attendees"}
+{"base_id":"payment_cloud","domain":"payment","request":"支付云服务账单。","tool":"payment.send","arguments":{"recipient":"cloud-provider","amount":1200},"critical_fields":["recipient","amount"],"unknown_field":"amount"}
+
