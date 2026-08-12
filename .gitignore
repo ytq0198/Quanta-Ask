@@ -1,5 +1,6 @@
 __pycache__/
 *.py[cod]
+*.egg-info/
 .pytest_cache/
 .venv/
 .env
@@ -7,4 +8,3 @@ data/generated/
 runs/
 reports/generated/
 *.log
-
